@@ -1,15 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { Resend } from 'resend'
+import { sendEmail } from '@/lib/email'
 import { EMAIL_2, EMAIL_3 } from '@/lib/emailSequences'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 const CRON_SECRET = process.env.CRON_SECRET
-
-function getResend() {
-  const key = process.env.RESEND_API_KEY
-  return key ? new Resend(key) : null
-}
 
 function markdownToHtml(text: string): string {
   return text.replace(
@@ -50,26 +45,21 @@ export async function GET(req: Request) {
     .gt('questionnaire_completed_at', seventyThreeHoursAgo.toISOString())
     .is('email_3_sent_at', null)
 
-  const resend = getResend()
-  if (resend) {
-    for (const p of profiles24 ?? []) {
-      await resend.emails.send({
-        from: 'PRIMOVIDAL <onboarding@resend.dev>',
-        to: p.email,
-        subject: EMAIL_2.subject(p.first_name ?? 'there'),
-        html: markdownToHtml(EMAIL_2.body(p.first_name ?? 'there', unlockUrl)),
-      })
-      await admin.from('profiles').update({ email_2_sent_at: now.toISOString() }).eq('id', p.id)
-    }
-    for (const p of profiles72 ?? []) {
-      await resend.emails.send({
-        from: 'PRIMOVIDAL <onboarding@resend.dev>',
-        to: p.email,
-        subject: EMAIL_3.subject(p.first_name ?? 'there'),
-        html: markdownToHtml(EMAIL_3.body(p.first_name ?? 'there', unlockUrl)),
-      })
-      await admin.from('profiles').update({ email_3_sent_at: now.toISOString() }).eq('id', p.id)
-    }
+  for (const p of profiles24 ?? []) {
+    const sent = await sendEmail(
+      p.email,
+      EMAIL_2.subject(p.first_name ?? 'there'),
+      markdownToHtml(EMAIL_2.body(p.first_name ?? 'there', unlockUrl))
+    )
+    if (sent) await admin.from('profiles').update({ email_2_sent_at: now.toISOString() }).eq('id', p.id)
+  }
+  for (const p of profiles72 ?? []) {
+    const sent = await sendEmail(
+      p.email,
+      EMAIL_3.subject(p.first_name ?? 'there'),
+      markdownToHtml(EMAIL_3.body(p.first_name ?? 'there', unlockUrl))
+    )
+    if (sent) await admin.from('profiles').update({ email_3_sent_at: now.toISOString() }).eq('id', p.id)
   }
 
   return NextResponse.json({

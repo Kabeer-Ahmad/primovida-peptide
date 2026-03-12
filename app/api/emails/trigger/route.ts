@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { Resend } from 'resend'
+import { sendEmail } from '@/lib/email'
 import { EMAIL_1 } from '@/lib/emailSequences'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-
-function getResend() {
-  const key = process.env.RESEND_API_KEY
-  return key ? new Resend(key) : null
-}
 
 function markdownToHtml(text: string): string {
   return text.replace(
@@ -36,14 +31,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true })
     }
     const unlockUrl = `${APP_URL}/protocol/locked`
-    const resend = getResend()
-    if (resend) {
-      await resend.emails.send({
-        from: 'PRIMOVIDAL <onboarding@resend.dev>',
-        to: profile.email,
-        subject: EMAIL_1.subject(profile.first_name ?? 'there'),
-        html: markdownToHtml(EMAIL_1.body(profile.first_name ?? 'there', unlockUrl)),
-      })
+    const sent = await sendEmail(
+      profile.email,
+      EMAIL_1.subject(profile.first_name ?? 'there'),
+      markdownToHtml(EMAIL_1.body(profile.first_name ?? 'there', unlockUrl))
+    )
+    if (sent) {
       await admin
         .from('profiles')
         .update({ email_1_sent_at: new Date().toISOString() })

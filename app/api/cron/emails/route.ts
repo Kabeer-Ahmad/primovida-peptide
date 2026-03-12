@@ -22,10 +22,11 @@ export async function GET(req: Request) {
   const now = new Date()
   const unlockUrl = `${APP_URL}/protocol/locked`
 
+  // Daily cron (Hobby): 24h window for Email 2 (24–48h ago), 72h window for Email 3 (72–96h ago)
   const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-  const twentyFiveHoursAgo = new Date(now.getTime() - 25 * 60 * 60 * 1000)
+  const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000)
   const seventyTwoHoursAgo = new Date(now.getTime() - 72 * 60 * 60 * 1000)
-  const seventyThreeHoursAgo = new Date(now.getTime() - 73 * 60 * 60 * 1000)
+  const ninetySixHoursAgo = new Date(now.getTime() - 96 * 60 * 60 * 1000)
 
   const { data: profiles24 } = await admin
     .from('profiles')
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
     .eq('payment_status', 'unpaid')
     .not('questionnaire_completed_at', 'is', null)
     .lt('questionnaire_completed_at', twentyFourHoursAgo.toISOString())
-    .gt('questionnaire_completed_at', twentyFiveHoursAgo.toISOString())
+    .gt('questionnaire_completed_at', fortyEightHoursAgo.toISOString())
     .is('email_2_sent_at', null)
 
   const { data: profiles72 } = await admin
@@ -42,7 +43,7 @@ export async function GET(req: Request) {
     .eq('payment_status', 'unpaid')
     .not('questionnaire_completed_at', 'is', null)
     .lt('questionnaire_completed_at', seventyTwoHoursAgo.toISOString())
-    .gt('questionnaire_completed_at', seventyThreeHoursAgo.toISOString())
+    .gt('questionnaire_completed_at', ninetySixHoursAgo.toISOString())
     .is('email_3_sent_at', null)
 
   for (const p of profiles24 ?? []) {

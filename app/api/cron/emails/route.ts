@@ -1,17 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, bodyToEmailHtml } from '@/lib/email'
 import { EMAIL_2, EMAIL_3 } from '@/lib/emailSequences'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 const CRON_SECRET = process.env.CRON_SECRET
-
-function markdownToHtml(text: string): string {
-  return text.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" style="display:inline-block;background:#C9A84C;color:#0A0A0A;font-weight:bold;padding:14px 28px;border-radius:1rem;text-decoration:none;margin-top:16px">$1</a>'
-  )
-}
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get('authorization')
@@ -50,7 +43,7 @@ export async function GET(req: Request) {
     const sent = await sendEmail(
       p.email,
       EMAIL_2.subject(p.first_name ?? 'there'),
-      markdownToHtml(EMAIL_2.body(p.first_name ?? 'there', unlockUrl))
+      bodyToEmailHtml(EMAIL_2.body(p.first_name ?? 'there', unlockUrl))
     )
     if (sent) await admin.from('profiles').update({ email_2_sent_at: now.toISOString() }).eq('id', p.id)
   }
@@ -58,7 +51,7 @@ export async function GET(req: Request) {
     const sent = await sendEmail(
       p.email,
       EMAIL_3.subject(p.first_name ?? 'there'),
-      markdownToHtml(EMAIL_3.body(p.first_name ?? 'there', unlockUrl))
+      bodyToEmailHtml(EMAIL_3.body(p.first_name ?? 'there', unlockUrl))
     )
     if (sent) await admin.from('profiles').update({ email_3_sent_at: now.toISOString() }).eq('id', p.id)
   }

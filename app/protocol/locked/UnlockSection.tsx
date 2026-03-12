@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 export default function UnlockSection({
   userId,
@@ -10,24 +9,37 @@ export default function UnlockSection({
   userId: string
   email: string
 }) {
-  const router = useRouter()
   const [plan, setPlan] = useState<'monthly' | 'annual'>('annual')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleUnlock() {
     setLoading(true)
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan, userId, email }),
-    })
-    const data = await res.json()
-    if (data?.url) router.push(data.url)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan,
+          userId,
+          email,
+          returnBaseUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
+        }),
+      })
+      const data = await res.json()
+      if (data?.url) {
+        window.location.href = data.url
+        return
+      }
+      if (data?.error) setError(data.error)
+    } catch (e) {
+      setError('Something went wrong. Please try again.')
+    }
     setLoading(false)
   }
 
   return (
-    <div className="relative z-20 mt-8 px-5 pb-12 max-w-[390px] mx-auto animate-fade-in-up">
+    <div className="relative z-20 mt-8 pb-12 w-full animate-fade-in-up">
       <div className="flex flex-col items-center justify-center py-8 rounded-2xl bg-white/90 backdrop-blur-sm">
         <svg
           width="48"
@@ -43,6 +55,7 @@ export default function UnlockSection({
         </svg>
         <p className="text-[#0A0A0A] font-bold text-xl">Unlock to read your full protocol</p>
       </div>
+      {error && <p className="mt-4 text-red-600 text-sm text-center">{error}</p>}
       <button
         onClick={handleUnlock}
         disabled={loading}

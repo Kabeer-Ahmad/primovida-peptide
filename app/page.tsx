@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function LandingPage() {
   return (
-    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col items-center justify-center px-5 py-12 max-w-[390px] mx-auto sm:max-w-lg sm:px-6 relative overflow-hidden">
+    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col items-center justify-center px-5 py-12 w-full max-w-[390px] mx-auto sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] sm:px-6 relative overflow-hidden">
       {/* Centred gradient blob */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] rounded-full opacity-[0.08] pointer-events-none"

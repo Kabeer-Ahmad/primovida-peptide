@@ -128,31 +128,37 @@ export default function QuestionnairePage() {
   }
 
   return (
-    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col max-w-[390px] mx-auto sm:max-w-lg relative">
-      {/* Progress bar */}
-      <div className="h-1.5 w-full bg-[#E5E7EB]">
+    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col w-full max-w-[390px] mx-auto sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] px-4 sm:px-6">
+      {/* Space above progress bar (safe area on notched devices + breathing room) */}
+      <div className="min-safe-top h-6 sm:h-8 shrink-0" aria-hidden />
+      {/* Progress bar - full width */}
+      <div className="h-1.5 w-full bg-[#E5E7EB] shrink-0 rounded-full overflow-hidden">
         <div
           className="h-full bg-[#C9A84C] rounded-r-full animate-progress"
           style={{ width: `${((currentStep + 1) / TOTAL) * 100}%` }}
         />
       </div>
-      <p className="text-[#6B7280] text-base px-5 pt-3">Question {currentStep + 1} of {TOTAL}</p>
+      {/* Back + Question label - no overlap */}
+      <div className="flex items-center justify-between pt-3 pb-2 min-h-[48px] shrink-0">
+        {currentStep > 0 ? (
+          <button
+            type="button"
+            onClick={() => setCurrentStep((s) => s - 1)}
+            className="text-[#0A0A0A] p-2 -m-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Back"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+          </button>
+        ) : (
+          <span className="w-10" aria-hidden />
+        )}
+        <p className="text-[#6B7280] text-base text-center flex-1">Question {currentStep + 1} of {TOTAL}</p>
+        {currentStep > 0 ? <span className="w-10" aria-hidden /> : <span className="w-10" aria-hidden />}
+      </div>
 
-      {/* Back */}
-      {currentStep > 0 && (
-        <button
-          type="button"
-          onClick={() => setCurrentStep((s) => s - 1)}
-          className="absolute left-5 top-6 text-[#0A0A0A] p-2 -m-2 min-h-[48px] min-w-[48px] flex items-center justify-center"
-          aria-label="Back"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
-      )}
-
-      <div className="flex-1 flex flex-col px-5 pt-8 pb-8" key={currentStep}>
+      <div className="flex-1 flex flex-col pt-6 sm:pt-8 pb-8" key={currentStep}>
         <h2 className="text-[#0A0A0A] font-bold text-2xl text-center animate-fade-in-up">{q.question}</h2>
 
         {isChoice && (
@@ -223,9 +229,13 @@ export default function QuestionnairePage() {
             type="button"
             onClick={handleNext}
             disabled={loading}
-            className="mt-auto pt-8 w-full min-h-[48px] flex items-center justify-center bg-[#C9A84C] text-[#0A0A0A] font-bold text-base rounded-2xl hover:opacity-95 active:scale-[0.98] transition-all duration-200 animate-fade-in opacity-0 animate-fill-forwards animate-delay-150"
+            className="btn-next mt-auto pt-8 w-full rounded-2xl bg-[#C9A84C] text-[#0A0A0A] font-bold text-base hover:opacity-95 active:scale-[0.98] transition-all duration-200 animate-fade-in opacity-0 animate-fill-forwards animate-delay-150 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {loading ? 'Saving…' : currentStep === TOTAL - 1 ? 'See my protocol' : 'Next'}
+            <span className="btn-next__inner">
+              <span className="btn-next__label">
+                {loading ? 'Saving…' : currentStep === TOTAL - 1 ? 'See my protocol' : 'Next'}
+              </span>
+            </span>
           </button>
         )}
       </div>

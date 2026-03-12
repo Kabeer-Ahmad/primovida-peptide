@@ -3,18 +3,11 @@ import { headers } from 'next/headers'
 import Stripe from 'stripe'
 import { getStripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, bodyToEmailHtml } from '@/lib/email'
 import { EMAIL_4 } from '@/lib/emailSequences'
 
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-
-function markdownToHtml(text: string): string {
-  return text.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" style="display:inline-block;background:#C9A84C;color:#0A0A0A;font-weight:bold;padding:12px 24px;border-radius:1rem;text-decoration:none;margin-top:16px">$1</a>'
-  )
-}
 
 export async function POST(req: Request) {
   if (!WEBHOOK_SECRET) {
@@ -83,7 +76,7 @@ export async function POST(req: Request) {
           await sendEmail(
             profiles[0].email,
             EMAIL_4.subject(),
-            markdownToHtml(EMAIL_4.body(profiles[0].first_name ?? 'there', billingPortalUrl))
+            bodyToEmailHtml(EMAIL_4.body(profiles[0].first_name ?? 'there', billingPortalUrl))
           )
         }
       }

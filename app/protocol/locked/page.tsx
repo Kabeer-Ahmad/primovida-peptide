@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getProtocolForGoal } from '@/lib/protocols'
 import UnlockSection from './UnlockSection'
+import LogoutButton from '@/components/LogoutButton'
 
 export default async function LockedProtocolPage() {
   const supabase = await createClient()
@@ -34,8 +35,8 @@ export default async function LockedProtocolPage() {
   const content = protocol.content(firstName)
 
   return (
-    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col max-w-[390px] mx-auto sm:max-w-lg">
-      <div className="px-5 pt-8">
+    <main className="min-h-dvh w-full bg-[#FFFFFF] flex flex-col w-full max-w-[390px] mx-auto sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] px-4 sm:px-6">
+      <div className="pt-6 sm:pt-8">
         <h1 className="text-[#0A0A0A] font-bold text-3xl">
           Your protocol is ready, {firstName}
         </h1>
@@ -44,7 +45,7 @@ export default async function LockedProtocolPage() {
         </p>
       </div>
       {/* Blurred protocol preview - real content, visually obscured */}
-      <div className="relative px-5 pt-6">
+      <div className="relative pt-6">
         <div
           className="relative select-none overflow-hidden rounded-2xl border border-[#E5E7EB]"
           style={{ maxHeight: '40vh' }}
@@ -59,16 +60,30 @@ export default async function LockedProtocolPage() {
               </p>
             ))}
           </div>
-          {/* White gradient fade at bottom */}
+          {/* White gradient fade at bottom (behind overlay so text stays on top) */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(255,255,255,0.9) 70%, #fff 100%)',
+              background: 'linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(255,255,255,0.85) 60%, #fff 100%)',
             }}
           />
+          {/* Motivational overlay - no product reveal */}
+          <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center px-6 py-8">
+            <div className="rounded-xl bg-white/80 backdrop-blur-sm px-5 py-4 max-w-[300px]">
+              <p className="text-[#0A0A0A] font-semibold text-center text-sm sm:text-base leading-relaxed">
+                Your exact compound, dose, and cycle — tailored to your goal.
+              </p>
+              <p className="text-[#6B7280] text-center text-sm mt-3 leading-relaxed">
+                Backed by research. Written for you. Unlock to see your full protocol and where we recommend you source from.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
       <UnlockSection userId={user.id} email={profile?.email ?? user.email ?? ''} />
+      <div className="mt-8 pb-12 flex justify-center">
+        <LogoutButton />
+      </div>
     </main>
   )
 }

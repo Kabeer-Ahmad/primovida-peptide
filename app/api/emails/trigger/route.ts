@@ -1,0 +1,60 @@
+import { NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { Resend } from 'resend'
+import { EMAIL_1 } from '@/lib/emailSequences'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  return key ? new Resend(key) : null
+}
+
+function markdownToHtml(text: string): string {
+  return text.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" style="display:inline-block;background:#C9A84C;color:#0A0A0A;font-weight:bold;padding:14px 28px;border-radius:1rem;text-decoration:none;margin-top:16px">$1</a>'
+  )
+}
+
+export async function POST(req: Request) {
+  try {
+    const { userId, event } = await req.json()
+    if (event !== 'questionnaire_completed' || !userId) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+    }
+    const admin = createAdminClient()
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('first_name, email, payment_status, email_1_sent_at')
+      .eq('id', userId)
+      .single()
+    if (!profile?.email || profile.payment_status === 'paid') {
+      return NextResponse.json({ ok: true })
+    }
+    if (profile.email_1_sent_at) {
+      return NextResponse.json({ ok: true })
+    }
+    const unlockUrl = `${APP_URL}/protocol/locked`
+    const resend = getResend()
+    if (resend) {
+      await resend.emails.send({
+        from: 'PRIMOVIDAL <onboarding@resend.dev>',
+        to: profile.email,
+        subject: EMAIL_1.subject(profile.first_name ?? 'there'),
+        html: markdownToHtml(EMAIL_1.body(profile.first_name ?? 'there', unlockUrl)),
+      })
+      await admin
+        .from('profiles')
+        .update({ email_1_sent_at: new Date().toISOString() })
+        .eq('id', userId)
+    }
+    return NextResponse.json({ ok: true })
+  } catch (e) {
+    console.error('Email trigger error', e)
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : 'Trigger failed' },
+      { status: 500 }
+    )
+  }
+}

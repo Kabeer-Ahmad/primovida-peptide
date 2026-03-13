@@ -5,9 +5,11 @@ import { useState } from 'react'
 export default function UnlockSection({
   userId,
   email,
+  embedded = false,
 }: {
   userId: string
   email: string
+  embedded?: boolean
 }) {
   const [plan, setPlan] = useState<'monthly' | 'annual'>('annual')
   const [loading, setLoading] = useState(false)
@@ -32,70 +34,73 @@ export default function UnlockSection({
         return
       }
       if (data?.error) setError(data.error)
-    } catch (e) {
+    } catch {
       setError('Something went wrong. Please try again.')
     }
     setLoading(false)
   }
 
   return (
-    <div className="relative z-20 mt-8 pb-12 w-full animate-fade-in-up">
-      <div className="flex flex-col items-center justify-center py-8 rounded-2xl bg-white/90 backdrop-blur-sm">
-        <svg
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#C9A84C"
-          strokeWidth="2"
-          className="mb-4"
-        >
-          <rect x="3" y="11" width="18" height="11" rx="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-        <p className="text-[#0A0A0A] font-bold text-xl">Unlock to read your full protocol</p>
-      </div>
-      {error && <p className="mt-4 text-red-600 text-sm text-center">{error}</p>}
+    <div className={`w-full ${embedded ? 'mt-4' : 'relative z-20 mt-8 pb-12 animate-fade-in-up'}`}>
+      {!embedded && (
+        <div className="flex flex-col items-center justify-center rounded-2xl bg-white/90 py-8 backdrop-blur-sm">
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#C9A84C"
+            strokeWidth="2"
+            className="mb-4"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <p className="text-center text-xl font-bold text-[#0A0A0A]">Unlock to read your full protocol</p>
+        </div>
+      )}
+      {error && <p className="mt-3 text-center text-sm text-red-600">{error}</p>}
       <button
+        type="button"
         onClick={handleUnlock}
         disabled={loading}
-        className="mt-6 w-full min-h-[48px] flex items-center justify-center bg-[#C9A84C] text-[#0A0A0A] font-bold text-base rounded-2xl hover:opacity-95 active:scale-[0.98] transition-all duration-200"
+        className="mt-4 w-full min-h-[52px] rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B85C] text-lg font-bold text-[#0A0A0A] shadow-[0_6px_20px_rgba(201,168,76,0.35)] transition-all hover:shadow-[0_8px_26px_rgba(201,168,76,0.42)] active:scale-[0.99] disabled:opacity-70"
       >
         {loading ? 'Redirecting…' : 'Unlock My Protocol'}
       </button>
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         <button
           type="button"
           onClick={() => setPlan('monthly')}
-          className={`min-h-[56px] rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
+          className={`min-h-[52px] rounded-xl border-2 p-2.5 text-left transition-all sm:min-h-[54px] sm:p-3 ${
             plan === 'monthly'
-              ? 'border-[#C9A84C] bg-[#C9A84C]/10'
-              : 'border-[#E5E7EB] bg-white'
+              ? 'border-[#C9A84C] bg-[#C9A84C]/12 shadow-sm'
+              : 'border-[#E8E4DC] bg-[#FAFAF8]'
           }`}
         >
-          <span className="font-bold text-base text-[#0A0A0A]">Monthly</span>
-          <p className="text-[#6B7280] text-sm mt-0.5">£29/month</p>
-          <p className="text-[#6B7280] text-sm">Cancel anytime</p>
+          <span className="text-sm font-bold text-[#1A1917] sm:text-base">Monthly</span>
+          <p className="mt-0.5 text-xs text-[#6B6560] sm:text-sm">£29/mo</p>
+          <p className="text-xs text-[#9CA3AF]">Cancel anytime</p>
         </button>
         <button
           type="button"
           onClick={() => setPlan('annual')}
-          className={`min-h-[56px] rounded-2xl border-2 p-4 text-left transition-all duration-200 relative ${
+          className={`relative min-h-[52px] rounded-xl border-2 p-2.5 text-left transition-all sm:min-h-[54px] sm:p-3 ${
             plan === 'annual'
-              ? 'border-[#C9A84C] bg-[#C9A84C]/10'
-              : 'border-[#E5E7EB] bg-white'
+              ? 'border-[#C9A84C] bg-[#C9A84C]/12 shadow-sm'
+              : 'border-[#E8E4DC] bg-[#FAFAF8]'
           }`}
         >
-          <span className="absolute top-2 right-2 text-xs font-bold bg-[#C9A84C] text-[#0A0A0A] px-2 py-0.5 rounded-full">
+          <span className="absolute right-2 top-2 rounded-full bg-[#C9A84C] px-2 py-0.5 text-[10px] font-bold text-[#1A1917]">
             Save £99
           </span>
-          <span className="font-bold text-base text-[#0A0A0A]">Annual</span>
-          <p className="text-[#6B7280] text-sm mt-0.5">£249/year</p>
-          <p className="text-[#6B7280] text-sm">Best value</p>
+          <span className="text-sm font-bold text-[#1A1917] sm:text-base">Annual</span>
+          <p className="mt-0.5 text-xs text-[#6B6560] sm:text-sm">£249/yr</p>
+          <p className="text-xs text-[#9CA3AF]">Best value</p>
         </button>
       </div>
-      <p className="text-[#6B7280] text-sm text-center mt-4">
-        Secure payment via Stripe. Cancel anytime.
+      <p className="mt-4 text-center text-xs text-[#8B8680] sm:text-sm">
+        Secure checkout with Stripe. You keep access to your protocol after unlock.
       </p>
     </div>
   )

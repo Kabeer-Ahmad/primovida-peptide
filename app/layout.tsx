@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import ConditionalFooter from '@/components/ConditionalFooter'
 import './globals.css'
 
 const inter = Inter({
@@ -11,7 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'PRIMOVIDAL — Your personalised peptide protocol',
   description:
-    'Answer 18 questions. Get a protocol written for your body, your goals, and your biology.',
+    'Find out exactly what peptide protocol is right for you. Takes 2 minutes.',
 }
 
 export const viewport: Viewport = {
@@ -27,8 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+      <body className={`${inter.variable} font-sans antialiased flex min-h-dvh flex-col`}>
+        <div className="flex min-h-0 min-h-dvh flex-1 flex-col">{children}</div>
+        <ConditionalFooter />
       </body>
     </html>
   )

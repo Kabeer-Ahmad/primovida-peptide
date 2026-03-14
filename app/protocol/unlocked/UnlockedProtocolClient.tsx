@@ -140,6 +140,7 @@ export default function UnlockedProtocolClient({
   goal,
   affiliateLink,
   disclaimer,
+  embedInDashboard = false,
 }: {
   blocks: JournalBlock[]
   compound: string
@@ -147,6 +148,8 @@ export default function UnlockedProtocolClient({
   goal: string
   affiliateLink: string
   disclaimer: string
+  /** When true, shell provides Sign out; trim outer chrome slightly */
+  embedInDashboard?: boolean
 }) {
   d = 0
   const intro: Extract<JournalBlock, { kind: 'paragraph' }>[] = []
@@ -195,7 +198,9 @@ export default function UnlockedProtocolClient({
   }
 
   return (
-    <main className="min-h-dvh w-full bg-gradient-to-b from-[#FAFAF8] via-[#FFFFFF] to-[#F5F2EC] pb-0 pt-[max(0.75rem,env(safe-area-inset-top))]">
+    <main
+      className={`min-h-dvh w-full bg-gradient-to-b from-[#FAFAF8] via-[#FFFFFF] to-[#F5F2EC] pb-0 ${embedInDashboard ? 'pt-3 sm:pt-5' : 'pt-[max(0.75rem,env(safe-area-inset-top))]'}`}
+    >
       <div className="mx-auto w-full max-w-[680px] px-3 sm:px-6">
         <header
           className={`protocol-section-in ${delay()} relative overflow-hidden rounded-2xl border border-[#1A1917] bg-[#0A0A0A] px-4 py-6 text-white sm:px-8 sm:py-10`}
@@ -339,9 +344,13 @@ export default function UnlockedProtocolClient({
         <p className={`protocol-section-in ${delay()} mt-5 px-1 text-center text-[10px] leading-relaxed text-[#9CA3AF] sm:mt-6 sm:text-[11px]`}>
           {disclaimer}
         </p>
-        <div className="mt-6 flex justify-center pb-[max(2rem,env(safe-area-inset-bottom))] sm:mt-8">
-          <LogoutButton />
-        </div>
+        {!embedInDashboard ? (
+          <div className="mt-6 flex justify-center pb-[max(2rem,env(safe-area-inset-bottom))] sm:mt-8">
+            <LogoutButton />
+          </div>
+        ) : (
+          <div className="h-[max(1.25rem,env(safe-area-inset-bottom))] sm:h-8" aria-hidden />
+        )}
       </div>
     </main>
   )

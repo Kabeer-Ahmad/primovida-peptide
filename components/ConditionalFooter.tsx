@@ -9,6 +9,7 @@ const NO_FOOTER = new Set([
   '/signup',
   '/questionnaire',
   '/protocol/unlocked',
+  '/dashboard',
 ])
 
 export default function ConditionalFooter() {

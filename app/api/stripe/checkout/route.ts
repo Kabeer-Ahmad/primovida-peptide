@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       mode: 'subscription',
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${baseUrl}/protocol/unlocked?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${baseUrl}/api/stripe/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/protocol/locked`,
       metadata: { supabase_user_id: userId },
     })

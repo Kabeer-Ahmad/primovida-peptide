@@ -36,7 +36,7 @@ export default async function LockedProtocolPage() {
     .eq('id', user.id)
     .single()
 
-  if (profile?.payment_status === 'paid') redirect('/protocol/unlocked')
+  if (profile?.payment_status === 'paid') redirect('/dashboard')
 
   const { data: qa } = await admin
     .from('questionnaire_answers')
@@ -83,7 +83,6 @@ export default async function LockedProtocolPage() {
           </div>
         </article>
 
-        {/* Blur + motion: full height from here down to just above Sign out */}
         <div className="relative mt-3 min-h-0 flex-1 overflow-hidden rounded-xl border border-[#D4CEC3]/60 bg-[#FAF8F4]">
           <div
             className="locked-blur-texture pointer-events-none absolute inset-0 overflow-hidden"

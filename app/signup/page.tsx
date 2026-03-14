@@ -8,6 +8,7 @@ import {
   loadPendingQuestionnaire,
   clearPendingQuestionnaire,
 } from '@/lib/pending-questionnaire'
+import { signInAction } from './actions'
 
 function FieldIcon({ type }: { type: 'user' | 'mail' | 'lock' }) {
   const c = 'h-5 w-5 text-[#9CA3AF]'
@@ -52,13 +53,15 @@ function SignupForm() {
     const supabase = createClient()
 
     if (fromPayment || isSignIn) {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-      if (!signInError) {
-        router.replace(fromPayment ? '/protocol/unlocked' : '/protocol/locked')
+      // Server action sets session cookies on the response — client-only signIn often
+      // leaves the server blind on the next RSC request, so /dashboard bounced to signup.
+      const result = await signInAction(email, password)
+      if (result?.error) {
+        setError(result.error)
         setLoading(false)
         return
       }
-      setError(signInError.message)
+      // redirect() in action throws; we only get here if something odd happened
       setLoading(false)
       return
     }

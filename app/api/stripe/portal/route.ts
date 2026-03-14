@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   try {
     const session = await getStripe().billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${APP_URL}/protocol/unlocked`,
+      return_url: `${APP_URL}/dashboard`,
     })
     return NextResponse.redirect(session.url)
   } catch (e) {

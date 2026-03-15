@@ -358,20 +358,13 @@ export default function QuestionnairePage() {
             </svg>
           </button>
           <div className="min-w-0 flex-1">
-            <div className="mb-1 flex justify-between text-[11px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
-              <span>Step {currentStep + 1}</span>
-              <span>{TOTAL} total</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-[#E8E6E3]">
+            <div className="h-2 overflow-hidden rounded-full bg-[#E8E6E3]" role="progressbar" aria-valuenow={currentStep + 1} aria-valuemin={1} aria-valuemax={TOTAL} aria-label="Progress">
               <div
                 className="questionnaire-progress-fill h-full rounded-full bg-[#C9A84C]"
                 style={{ width: `${pct}%` }}
               />
             </div>
           </div>
-          <span className="w-11 shrink-0 text-right text-sm font-bold tabular-nums text-[#C9A84C]">
-            {Math.round(pct)}%
-          </span>
         </div>
 
         {/* Middle: question header (fixed) + scrollable body */}

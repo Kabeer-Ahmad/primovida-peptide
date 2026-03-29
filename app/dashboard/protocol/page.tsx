@@ -8,8 +8,6 @@ import UnlockedProtocolClient from '@/app/protocol/unlocked/UnlockedProtocolClie
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
-const AFFILIATE_LINK = process.env.NEXT_PUBLIC_AFFILIATE_LINK ?? '#'
-
 export default async function DashboardProtocolPage() {
   const supabase = await createClient()
   const {
@@ -59,7 +57,6 @@ export default async function DashboardProtocolPage() {
         compound={protocol.compound}
         firstName={firstName}
         goal={goal}
-        affiliateLink={AFFILIATE_LINK}
         disclaimer={DISCLAIMER}
         embedInDashboard
       />

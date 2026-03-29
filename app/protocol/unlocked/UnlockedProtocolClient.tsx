@@ -13,9 +13,12 @@ import {
   Sparkles,
   ClipboardList,
   Truck,
+  Globe,
+  MapPin,
 } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 import type { JournalBlock } from '@/lib/protocolJournal'
+import { SUPPLIER_US_HREF, SUPPLIER_WORLDWIDE_HREF } from '@/lib/supplierLinks'
 
 function iconForTitle(title: string): LucideIcon {
   const t = title.toLowerCase()
@@ -138,7 +141,6 @@ export default function UnlockedProtocolClient({
   compound,
   firstName,
   goal,
-  affiliateLink,
   disclaimer,
   embedInDashboard = false,
 }: {
@@ -146,7 +148,6 @@ export default function UnlockedProtocolClient({
   compound: string
   firstName: string
   goal: string
-  affiliateLink: string
   disclaimer: string
   /** When true, shell provides Sign out; trim outer chrome slightly */
   embedInDashboard?: boolean
@@ -325,19 +326,47 @@ export default function UnlockedProtocolClient({
                 <Truck className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2} aria-hidden />
               </span>
               <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C9A84C]">Recommended supplier</p>
-                <h2 className="mt-1 text-lg font-bold sm:text-2xl">Peptide Sciences</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C9A84C]">Verified suppliers</p>
+                <h2 className="mt-1 text-lg font-bold sm:text-2xl">Where to buy</h2>
               </div>
             </div>
-            <p className="mt-3 text-xs text-[#9CA3AF] sm:text-base">Third-party tested. Ships internationally. Used and trusted.</p>
-            <Link
-              href={affiliateLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-5 flex min-h-[48px] w-full items-center justify-center rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B85C] text-base font-bold text-[#0A0A0A] shadow-[0_6px_24px_rgba(201,168,76,0.35)] transition-all hover:shadow-lg active:scale-[0.99] sm:mt-6 sm:min-h-[52px] sm:text-lg"
-            >
-              Order now →
-            </Link>
+            <p className="mt-4 text-sm leading-relaxed text-[#D1D5DB] sm:text-base">
+              Open the site that fits your location. Use their search to find{' '}
+              <strong className="font-semibold text-white">{compound}</strong> — or the exact peptide name spelled in
+              your protocol above — then add it to your cart and check out on their site. We don’t sell products; these
+              are independent stores we trust for verification and quality.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:gap-4">
+              <Link
+                href={SUPPLIER_US_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-[52px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl bg-gradient-to-r from-[#C9A84C] to-[#D4B85C] px-4 py-3 text-center text-[#0A0A0A] shadow-[0_6px_24px_rgba(201,168,76,0.35)] transition-all hover:shadow-lg active:scale-[0.99] sm:min-h-[56px] sm:flex-row sm:gap-2"
+              >
+                <span className="inline-flex items-center gap-2 text-base font-bold">
+                  <MapPin className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+                  US only — Apollo Peptide Sciences
+                </span>
+                <span className="text-xs font-semibold text-[#0A0A0A]/75 sm:ml-1 sm:text-sm">Verified supplier →</span>
+              </Link>
+              <Link
+                href={SUPPLIER_WORLDWIDE_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-[52px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-[#C9A84C]/50 bg-white/5 px-4 py-3 text-center text-white transition-all hover:border-[#C9A84C] hover:bg-white/[0.07] active:scale-[0.99] sm:min-h-[56px] sm:flex-row sm:gap-2"
+              >
+                <span className="inline-flex items-center gap-2 text-base font-bold">
+                  <Globe className="h-5 w-5 shrink-0 text-[#C9A84C]" strokeWidth={2} aria-hidden />
+                  Worldwide — Vitality Peptides
+                </span>
+                <span className="text-xs font-semibold text-[#9CA3AF] sm:ml-1 sm:text-sm">Verified supplier →</span>
+              </Link>
+            </div>
+            <p className="mt-4 text-[11px] leading-relaxed text-[#9CA3AF] sm:text-xs">
+              <strong className="font-semibold text-[#D1D5DB]">Worldwide:</strong> check your country’s regulations to
+              make sure the item is allowed before you order. Shipping is only available to countries where it is
+              permitted.
+            </p>
           </div>
         </section>
 

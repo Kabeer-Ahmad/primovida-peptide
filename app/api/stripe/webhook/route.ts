@@ -9,6 +9,24 @@ import { EMAIL_4 } from '@/lib/emailSequences'
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
+function subscriptionToProfileUpdate(sub: Stripe.Subscription): {
+  payment_status: 'paid' | 'unpaid'
+  subscription_status: string
+} {
+  const status = sub.status
+  // Still in paid period until Stripe marks canceled; cancel_at_period_end keeps access until period end.
+  if (status === 'active' || status === 'trialing') {
+    return { payment_status: 'paid', subscription_status: 'active' }
+  }
+  if (status === 'past_due') {
+    return { payment_status: 'unpaid', subscription_status: 'past_due' }
+  }
+  if (status === 'canceled' || status === 'unpaid') {
+    return { payment_status: 'unpaid', subscription_status: status }
+  }
+  return { payment_status: 'unpaid', subscription_status: status }
+}
+
 export async function POST(req: Request) {
   if (!WEBHOOK_SECRET) {
     return NextResponse.json({ error: 'Webhook secret not set' }, { status: 500 })
@@ -80,6 +98,18 @@ export async function POST(req: Request) {
           )
         }
       }
+      break
+    }
+    case 'customer.subscription.updated': {
+      const subscription = event.data.object as Stripe.Subscription
+      const customerId = subscription.customer as string
+      const { data: profiles } = await admin
+        .from('profiles')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+      if (!profiles?.length) break
+      const patch = subscriptionToProfileUpdate(subscription)
+      await admin.from('profiles').update(patch).eq('id', profiles[0].id)
       break
     }
     case 'customer.subscription.deleted': {
